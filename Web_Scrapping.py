@@ -1,64 +1,32 @@
-import requests
 from bs4 import BeautifulSoup
-import datetime
+import requests
+import time
 
-# Define target website URL and days to look back
-base_url = "https://www.example.com/jobs"  # Replace with target site
-days_back = 3  # Number of days to look back for recent jobs
+print('Put some skill that you are not familiar with')
+unfamiliar_skill = input('>')
+print(f'Filtering out {unfamiliar_skill}')
 
-# Generate formatted date string for comparison
-today = datetime.date.today()
-threshold_date = today - datetime.timedelta(days=days_back)
-threshold_date_str = threshold_date.strftime('%Y-%m-%d')  # YYYY-MM-DD format
-
-def extract_recent_jobs(url):
-  """Extracts job postings from the given URL and checks for recent dates
-
-  Args:
-      url: The URL of the job posting page
-
-  Returns:
-      list: A list of dictionaries containing job details (title, date, etc.) for recent jobs
-  """
-  jobs = []
-  response = requests.get(url)
-  soup = BeautifulSoup(response.content, 'html.parser')
-
-  # Find all job postings (replace 'job-listing' with appropriate class/tag)
-  job_listings = soup.find_all('div', class_='job-listing')
-
-  for job in job_listings:
-    # Extract job details (title, date, etc.) based on the website's HTML structure
-    job_title = job.find('h3').text.strip()
-    # Replace with selector for finding the date posted
-    date_posted = job.find('span', class_='posted-date').text.strip()
-
-    # Check if the job was posted within the specified timeframe
-    if date_posted >= threshold_date_str:
-      jobs.append({
-          'title': job_title,
-          'date': date_posted,
-          # Add other job details as needed
-      })
-
-  return jobs
-
-# Iterate through pagination if website uses multiple pages for listings
-all_jobs = []
-next_page_url = base_url  # Assuming pagination starts at base URL
-
-while next_page_url:
-  # Call extract_recent_jobs function to get jobs from current page
-  current_page_jobs = extract_recent_jobs(next_page_url)
-  all_jobs.extend(current_page_jobs)
-
-  # Find the next page URL (replace logic based on website's pagination)
-  next_page_link = soup.find('a', rel='next')
-  if next_page_link:
-    next_page_url = next_page_link['href']
-  else:
-    next_page_url = None  # No more pages
-
-# Process and utilize the extracted jobs data (all_jobs)
-print(f"Found {len(all_jobs)} jobs posted in the last {days_back} days")
-# You can further process or store the jobs data (all_jobs) in a database, CSV, etc.
+def find_jobs():
+     html_text = requests.get('https://www.timesjobs.com/candidate/job-search.html?searchType=Home_Search&from=submit&asKey=OFF&txtKeywords=&cboPresFuncArea=35')
+     soup = BeautifulSoup(html_text, 'lxml')
+     jobs = soup.find_all('li', class_ = 'clearfix job-bx wht-shd-bx')
+     for index, job in enumerate(jobs):
+          published_date = job.find('span', class_='sim-posted').span.text
+          if 'few' in published_date:
+               company_name = job.find('h3', class_ = 'joblist-comp-nme').text.replace(' ','')
+               skills = job.find('span', class_ = 'srp-skills').text.replace(' ','')
+               more_info = job.header.h2.a['href']
+               if unfamiliar_skill not in skills:
+                    with open(f'posts/{index}.txt','w') as f:
+                         f.write(f"Comapny Name: {company_name.strip()}")
+                         f.write(f"Required Skills: {skills.strip()}")
+                         f.write(f"More Info: {more_info}")
+                    print(f'File saved: {index}')
+   
+if __name__ == '__main__':
+     while True:
+          find_jobs()
+          time_wait = 10
+          print(f'Waiting {time_wait} minutes...')
+          time.sleep(time_wait * 60)
+    
