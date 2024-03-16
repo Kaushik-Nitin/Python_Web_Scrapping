@@ -17,11 +17,9 @@ def find_jobs():
                skills = job.find('span', class_ = 'srp-skills').text.replace(' ','')
                more_info = job.header.h2.a['href']
                if unfamiliar_skill not in skills:
-                    with open(f'posts/{index}.txt','w') as f:
-                         f.write(f"Comapny Name: {company_name.strip()} \n")
-                         f.write(f"Required Skills: {skills.strip()} \n")
-                         f.write(f'More Info: {more_info} \n')
-                    print(f'File saved: {index}')
+                    print(f"Comapny Name: {company_name.strip()} \n")
+                    print(f"Required Skills: {skills.strip()} \n")
+                    print(f'More Info: {more_info} \n')
    
 if __name__ == '__main__':
      while True:
