@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup 
 import requests
 import time
 
@@ -18,9 +18,9 @@ def find_jobs():
                more_info = job.header.h2.a['href']
                if unfamiliar_skill not in skills:
                     with open(f'posts/{index}.txt','w') as f:
-                         f.write(f"Comapny Name: {company_name.strip()}")
-                         f.write(f"Required Skills: {skills.strip()}")
-                         f.write(f"More Info: {more_info}")
+                         f.write(f"Comapny Name: {company_name.strip()} \n")
+                         f.write(f"Required Skills: {skills.strip()} \n")
+                         f.write(f'More Info: {more_info} \n')
                     print(f'File saved: {index}')
    
 if __name__ == '__main__':
